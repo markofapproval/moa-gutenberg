@@ -300,6 +300,9 @@ function moa_codes_save_data( $post_ID = false, $post = false )
 			// Responsive Breakpoints.
 
 			if ( file_exists( $file_directory ) ) {
+
+//				file_put_contents(WP_CONTENT_DIR .'/moa-file.php', print_r($file_directory, true));
+
 				$editor_value = $wp_filesystem->get_contents( $file_directory );
 				$editor_screen = str_replace( "{$language_extension}-", '', $editor_id );
 				$editor_breakpoint_media = $breakpoints[$editor_screen];
@@ -353,6 +356,7 @@ function moa_codes_save_data( $post_ID = false, $post = false )
 			// Compile.
 			$compiler_function = "codes_compile_{$language}";
 			$compile_result = $compiler_function( $compileable );
+//			file_put_contents( WP_CONTENT_DIR . '/compiler.txt', print_r($compile_result, true ) );
 
 			if ( 'success' === $compile_result['status'] ) {
 				$compileable_file_name = "{$post_ID}-{$language_extension}-output.{$language_group_data->extension}";
