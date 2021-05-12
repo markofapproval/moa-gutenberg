@@ -17,3 +17,15 @@ function moa_intercept_cc(){
 		10,2);
 }
 add_action( 'plugins_loaded', 'moa_intercept_cc');
+
+function moa_override_pods_meta_blankout( $content, $args ){
+	if( $args == 'term'){
+		return false;
+	}
+	else{
+		return $content;
+	}
+
+
+}
+add_filter( 'pods_meta_handler_get', 'moa_override_pods_meta_blankout', 100, 2 );
