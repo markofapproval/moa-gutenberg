@@ -3,29 +3,47 @@
  * Plugin Name: MOA Gutenberg Project
  */
 
+define('MOA_BLOCKS_DIRPATH', plugin_dir_path(__FILE__) );
+define( 'MOA_BLOCKS_URL', plugin_dir_url(__FILE__) );
 
-function moa_intercept_cc(){
-	remove_action( 'edit_form_after_title', 'codes_editor_area' );
-	remove_action('save_post_custom-code',
-		'codes_save_data',
-		10);
-	require_once 'templates/custom-code/editor-override.php';
-	require_once 'templates/custom-code/editor-save-override.php';
-	add_action( 'edit_form_after_title', 'moa_codes_editor_area' );
-	add_action('save_post_custom-code',
-		'moa_codes_save_data',
-		10,2);
-}
-add_action( 'plugins_loaded', 'moa_intercept_cc');
+//register post types
+require_once 'includes/admin/class-create-post-types.php';
 
-function moa_override_pods_meta_blankout( $content, $args ){
-	if( $args == 'term'){
-		return false;
-	}
-	else{
-		return $content;
+//Integrations
+require_once 'includes/admin/integrations.php';
+require_once 'templates/custom-code/editor-override.php';
+require_once 'templates/custom-code/editor-save-override.php';
+
+class MOA_Blocks{
+
+	public function __construct() {
+		$this->init();
 	}
 
+	private function init(){
+
+
+		add_filter( 'moa_blocks_post_type_args', array( $this,'allow_viewing_of_templates' ) );
+		add_action( 'init', 'moa_blocks_create_post_types' );
+
+	}
+
+	public function allow_viewing_of_templates( $post_data ){
+		$user_id = get_current_user_id();
+		$user = get_user_by( 'id', $user_id );
+		$is_an_admin = $user > 0 && in_array( 'administrator', $user->roles );
+
+		if( $is_an_admin ){
+			$post_data[ 'templates' ] [ 'publicly_queryable'] = true;
+		}
+
+
+		return $post_data;
+
+	}
+
+
 
 }
-add_filter( 'pods_meta_handler_get', 'moa_override_pods_meta_blankout', 100, 2 );
+
+new MOA_Blocks();
